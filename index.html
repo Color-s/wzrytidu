@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
   <title>王者荣耀｜辅助梯度 & 巅峰分段适配（1200-2100）</title>
   <style>
     :root{
@@ -283,6 +283,75 @@
       line-height:1.65;
     }
     .hint{color:var(--muted);font-size:12px}
+  
+    /* -----------------------
+       Mobile fixes (scroll + layout)
+       ----------------------- */
+    html, body{height:100%}
+    body{overflow-x:hidden}
+    /* Ensure vertical scrolling still works on tappable cards */
+    .hero,.pick{touch-action:pan-y}
+    /* Horizontal scroll for tabs on small screens */
+    .tabs{touch-action:pan-x}
+    /* Lock background scroll when modal is open */
+    html.noScroll, body.noScroll{height:100%; overflow:hidden !important}
+
+    /* Make modal content scrollable on small screens */
+    .modalBackdrop{overflow:auto}
+    .modal{
+      max-height: calc(100vh - 32px);
+      display:flex;
+      flex-direction:column;
+    }
+    .modalBd{
+      overflow:auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Auto-hide sticky header on mobile (JS toggles .isHidden) */
+    header{
+      transition: transform .18s ease;
+      will-change: transform;
+    }
+    header.isHidden{transform: translateY(-110%)}
+
+    @media (max-width: 720px){
+      /* Safe area padding for notched devices */
+      header{padding-top: env(safe-area-inset-top)}
+      .wrap{
+        padding: 12px max(12px, env(safe-area-inset-right)) 12px max(12px, env(safe-area-inset-left));
+      }
+
+      h1{font-size:16px}
+      .subtitle{font-size:12px}
+      .pill{width:100%; justify-content:center}
+
+      .controls{flex-direction:column; align-items:stretch}
+      .tabs{
+        overflow-x:auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+      .tabs::-webkit-scrollbar{display:none}
+      .tab{flex:0 0 auto; white-space:nowrap}
+
+      .filters{display:grid; grid-template-columns: 1fr 1fr; gap:8px; width:100%}
+      select, button{width:100%}
+
+      /* Modal full-height on mobile */
+      .modalBackdrop{padding:0; align-items:stretch}
+      .modal{max-height:100vh; width:100%; border-radius:0}
+      .modalHd{
+        position:sticky; top:0; z-index:2;
+        background: linear-gradient(180deg, rgba(18,26,47,.98), rgba(15,23,42,.96));
+        backdrop-filter: blur(12px);
+      }
+    }
+
+    @media (max-width: 380px){
+      .filters{grid-template-columns:1fr}
+    }
+
   </style>
 </head>
 <body>
@@ -964,6 +1033,50 @@
     modalTips: document.getElementById("modalTips"),
     closeModalBtn: document.getElementById("closeModalBtn"),
   };
+  // ---- Mobile UX helpers ----
+  function setBodyScrollLocked(locked){
+    document.documentElement.classList.toggle("noScroll", !!locked);
+    document.body.classList.toggle("noScroll", !!locked);
+  }
+
+  // Auto-hide sticky header on small screens to free vertical space.
+  (function(){
+    const headerEl = document.querySelector("header");
+    if(!headerEl) return;
+
+    let lastY = window.scrollY || 0;
+    let ticking = false;
+
+    function update(){
+      ticking = false;
+      if(window.innerWidth > 720){
+        headerEl.classList.remove("isHidden");
+        lastY = window.scrollY || 0;
+        return;
+      }
+      const y = window.scrollY || 0;
+      const dy = y - lastY;
+
+      // Hide when scrolling down; show when scrolling up.
+      if(y > 90 && dy > 6) headerEl.classList.add("isHidden");
+      if(dy < -6) headerEl.classList.remove("isHidden");
+
+      lastY = y;
+    }
+
+    window.addEventListener("scroll", ()=>{
+      if(!ticking){
+        ticking = true;
+        requestAnimationFrame(update);
+      }
+    }, {passive:true});
+
+    window.addEventListener("resize", ()=>{
+      headerEl.classList.remove("isHidden");
+      lastY = window.scrollY || 0;
+    });
+  })();
+
 
   function init(){
     document.getElementById("today").textContent = new Date().toISOString().slice(0,10);
@@ -1179,12 +1292,15 @@
       <div class="hint">提示：矩阵评分是“更容易打出稳定胜率”，不是官方胜率数据。</div>
     `;
 
+    setBodyScrollLocked(true);
+
     els.modalBackdrop.style.display="flex";
     els.modalBackdrop.setAttribute("aria-hidden","false");
   }
 
   function closeModal(){
     els.modalBackdrop.style.display="none";
+    setBodyScrollLocked(false);
     els.modalBackdrop.setAttribute("aria-hidden","true");
   }
 

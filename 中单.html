@@ -1,0 +1,1220 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>王者荣耀｜中单梯度 & 巅峰分段适配（1200-2100）</title>
+  <style>
+    :root{
+      --bg0:#0b1020;
+      --bg1:#101a33;
+      --card:#121a2f;
+      --card2:#0f172a;
+      --text:#e8eefc;
+      --muted:#a9b4d0;
+      --line:rgba(255,255,255,.10);
+      --chip:rgba(255,255,255,.08);
+      --shadow: 0 14px 30px rgba(0,0,0,.35);
+      --accent:#7dd3fc;
+      --accent2:#a78bfa;
+      --good:#22c55e;
+      --ok:#60a5fa;
+      --mid:#fbbf24;
+      --bad:#f97316;
+      --awful:#ef4444;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "PingFang SC","Noto Sans CJK SC","Microsoft YaHei", Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--text);
+      background: radial-gradient(900px 500px at 10% 10%, rgba(167,139,250,.18), transparent 60%),
+                  radial-gradient(700px 500px at 90% 15%, rgba(125,211,252,.16), transparent 55%),
+                  linear-gradient(180deg, var(--bg0), var(--bg1));
+      min-height:100vh;
+    }
+    a{color:var(--accent)}
+    header{
+      position:sticky; top:0; z-index:30;
+      backdrop-filter: blur(12px);
+      background: linear-gradient(180deg, rgba(11,16,32,.90), rgba(11,16,32,.65));
+      border-bottom:1px solid var(--line);
+    }
+    .wrap{max-width:1200px;margin:0 auto;padding:18px 16px}
+    .titleRow{display:flex;gap:14px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
+    h1{
+      font-size:20px;margin:0;
+      letter-spacing:.2px;
+    }
+    .subtitle{margin-top:6px;color:var(--muted);font-size:13px;line-height:1.55}
+    .pill{
+      display:inline-flex;align-items:center;gap:8px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.05);
+      padding:8px 10px;border-radius:999px;
+      font-size:12px;color:var(--muted);
+      white-space:nowrap;
+    }
+    .pill strong{color:var(--text);font-weight:650}
+    .controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}
+    .tabs{
+      display:flex;gap:8px;flex-wrap:wrap;
+      padding:8px;border-radius:14px;border:1px solid var(--line);
+      background:rgba(255,255,255,.04);
+    }
+    .tab{
+      cursor:pointer; user-select:none;
+      padding:8px 10px;border-radius:10px;
+      color:var(--muted);font-size:13px;border:1px solid transparent;
+    }
+    .tab:hover{border-color:rgba(255,255,255,.10);color:var(--text)}
+    .tab.active{
+      background:linear-gradient(135deg, rgba(125,211,252,.18), rgba(167,139,250,.18));
+      border-color:rgba(255,255,255,.12);
+      color:var(--text);
+    }
+    .filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    select,button{
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:10px 10px;
+      font-size:13px;
+      outline:none;
+    }
+    button{cursor:pointer}
+    button:hover{border-color:rgba(255,255,255,.18)}
+    .grid{
+      display:grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap:14px;
+      margin-top:16px;
+    }
+    @media (max-width: 980px){
+      .grid{grid-template-columns:1fr}
+    }
+    .card{
+      background: linear-gradient(180deg, rgba(18,26,47,.92), rgba(15,23,42,.86));
+      border:1px solid var(--line);
+      border-radius:18px;
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .cardHd{
+      padding:14px 14px 10px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+    }
+    .cardHd h2{margin:0;font-size:14px;letter-spacing:.2px}
+    .cardBd{padding:14px}
+    .kpis{display:flex;gap:10px;flex-wrap:wrap}
+    .kpi{
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:14px;
+      padding:10px 10px;
+      min-width:160px;
+      flex: 1 1 160px;
+    }
+    .kpi .k{font-size:12px;color:var(--muted)}
+    .kpi .v{font-size:13px;margin-top:6px;line-height:1.35}
+    .list{margin:0;padding-left:18px;color:var(--muted);line-height:1.7;font-size:13px}
+    .topPicks{display:flex;gap:10px;flex-wrap:wrap}
+    .pick{
+      width:calc(50% - 5px);
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:16px;
+      padding:10px;
+      display:flex;gap:10px;align-items:center;
+    }
+    @media (max-width: 600px){
+      .pick{width:100%}
+    }
+    .avatar{
+      width:46px;height:46px;border-radius:12px;object-fit:cover;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.06);
+      flex:0 0 auto;
+    }
+    .pick .name{font-weight:700;font-size:13px}
+    .pick .desc{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.35}
+    .badge{
+      font-size:11px;border-radius:999px;padding:4px 8px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.05);
+      color:var(--muted);
+      white-space:nowrap;
+    }
+    .badge.t0{color:#dbeafe;border-color:rgba(125,211,252,.25);background:rgba(125,211,252,.10)}
+    .badge.t05{color:#ede9fe;border-color:rgba(167,139,250,.28);background:rgba(167,139,250,.10)}
+    .badge.t1{color:#e0f2fe;border-color:rgba(94,234,212,.25);background:rgba(94,234,212,.10)}
+    .badge.t2{color:#dcfce7;border-color:rgba(34,197,94,.22);background:rgba(34,197,94,.10)}
+    .badge.t3{color:#fef9c3;border-color:rgba(251,191,36,.25);background:rgba(251,191,36,.10)}
+    .badge.t4{color:#ffe4e6;border-color:rgba(244,63,94,.26);background:rgba(244,63,94,.10)}
+    .legend{
+      display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;
+      color:var(--muted);font-size:12px
+    }
+    .legend .dot{
+      width:10px;height:10px;border-radius:3px;display:inline-block;margin-right:6px;border:1px solid rgba(255,255,255,.12)
+    }
+    .dot.S{background:rgba(34,197,94,.85)}
+    .dot.A{background:rgba(96,165,250,.85)}
+    .dot.B{background:rgba(251,191,36,.85)}
+    .dot.C{background:rgba(249,115,22,.85)}
+    .dot.D{background:rgba(239,68,68,.85)}
+    .heroGrid{
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:10px;
+    }
+    @media (max-width: 980px){
+      .heroGrid{grid-template-columns:repeat(2,1fr)}
+    }
+    @media (max-width: 540px){
+      .heroGrid{grid-template-columns:1fr}
+    }
+    .hero{
+      cursor:pointer;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:16px;
+      padding:10px;
+      display:flex;gap:10px;align-items:flex-start;
+      transition: transform .12s ease, border-color .12s ease, background .12s ease;
+    }
+    .hero:hover{
+      transform: translateY(-1px);
+      border-color:rgba(255,255,255,.16);
+      background:rgba(255,255,255,.05);
+    }
+    .hero .meta{min-width:0;flex:1}
+    .hero .row{display:flex;gap:8px;align-items:center;justify-content:space-between}
+    .hero .nm{font-weight:780;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .hero .type{font-size:11px;color:var(--muted);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .matrix{
+      display:flex;gap:5px;flex-wrap:nowrap;margin-top:8px;
+    }
+    .cell{
+      width:20px;height:18px;border-radius:6px;
+      border:1px solid rgba(255,255,255,.10);
+      display:flex;align-items:center;justify-content:center;
+      font-size:11px;font-weight:800;
+      color:rgba(255,255,255,.92);
+      opacity:.95;
+    }
+    .cell.S{background:rgba(34,197,94,.78)}
+    .cell.A{background:rgba(96,165,250,.78)}
+    .cell.B{background:rgba(251,191,36,.78)}
+    .cell.C{background:rgba(249,115,22,.78)}
+    .cell.D{background:rgba(239,68,68,.78)}
+    .cell.sel{
+      outline:2px solid rgba(255,255,255,.75);
+      outline-offset:1px;
+      opacity:1;
+    }
+    .mini{font-size:11px;color:var(--muted);margin-top:8px}
+    .footer{
+      padding:18px 16px 34px;color:var(--muted);font-size:12px;line-height:1.7;
+      max-width:1200px;margin:0 auto;
+    }
+    .hr{height:1px;background:rgba(255,255,255,.10);margin:12px 0}
+    /* Modal */
+    .modalBackdrop{
+      position:fixed; inset:0; z-index:50;
+      background:rgba(0,0,0,.62);
+      display:none;
+      align-items:center; justify-content:center;
+      padding:16px;
+    }
+    .modal{
+      width:min(900px, 100%);
+      background:linear-gradient(180deg, rgba(18,26,47,.98), rgba(15,23,42,.96));
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:18px;
+      box-shadow: 0 26px 70px rgba(0,0,0,.55);
+      overflow:hidden;
+    }
+    .modalHd{
+      padding:14px;
+      border-bottom:1px solid rgba(255,255,255,.10);
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+    }
+    .modalHd .left{display:flex;gap:12px;align-items:center}
+    .modalHd h3{margin:0;font-size:15px}
+    .xBtn{
+      width:36px;height:36px;border-radius:12px;
+      display:flex;align-items:center;justify-content:center;
+    }
+    .modalBd{padding:14px}
+    .cols{display:grid;grid-template-columns:1.1fr .9fr;gap:14px}
+    @media (max-width: 900px){ .cols{grid-template-columns:1fr} }
+    .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+    .chip{
+      font-size:12px;color:var(--muted);
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:999px;
+      padding:6px 10px;
+    }
+    .bars{display:grid;grid-template-columns:1fr;gap:10px;margin-top:10px}
+    .barRow{display:grid;grid-template-columns:110px 1fr 34px;gap:10px;align-items:center}
+    .barRow .lbl{font-size:12px;color:var(--muted)}
+    .bar{
+      height:10px;border-radius:999px;border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.05);
+      overflow:hidden;
+    }
+    .fill{
+      height:100%;
+      background:linear-gradient(90deg, rgba(125,211,252,.85), rgba(167,139,250,.85));
+      width:50%;
+    }
+    .barRow .n{font-size:12px;color:var(--text);text-align:right}
+    .noteBox{
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:16px;
+      padding:12px;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.65;
+    }
+    .hint{color:var(--muted);font-size:12px}
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="titleRow">
+      <div>
+        <h1>王者荣耀｜中单梯度 & 巅峰分段适配（1200–2100）</h1>
+        <div class="subtitle">
+          这是一份“中路怎么选更容易抬胜率”的<strong>分段适配</strong>指南：同一个中单英雄，在不同巅峰分因为队友的控线/支援/小地图/团战理解不同，强度体感会差很多。<br/>
+          版本参考：S41赛季末公开梯度观点（数据截止 2025-12-23，页面底部标注来源）。更新时间：<span id="today"></span>
+        </div>
+      </div>
+      <div class="pill">
+        <span>当前分段：</span><strong id="currentBracketLabel">—</strong>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="tabs" id="tabs"></div>
+      <div class="filters">
+        <select id="tierFilter" title="按版本强度筛选">
+          <option value="ALL">全部梯度</option>
+          <option value="T0">仅看 T0</option>
+          <option value="T0.5">仅看 T0.5</option>
+          <option value="T1">仅看 T1</option>
+          <option value="T2">仅看 T2</option>
+          <option value="T3">仅看 T3</option>
+          <option value="T4">仅看 T4</option>
+        </select>
+        <select id="sortBy" title="排序">
+          <option value="RATING">按当前分段适配排序</option>
+          <option value="OVERALL">按版本梯度排序</option>
+          <option value="NAME">按名称排序</option>
+          <option value="DIFF">按上手难度排序</option>
+          <option value="ROAM">按支援能力排序</option>
+          <option value="CLEAR">按清线能力排序</option>
+        </select>
+        <button id="resetBtn">重置</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="grid">
+    <section class="card">
+      <div class="cardHd">
+        <h2>分段画像（队友倾向 & 中路该怎么“抬”胜率）</h2>
+        <span class="badge" id="macroBadge">—</span>
+      </div>
+      <div class="cardBd">
+        <div class="kpis" id="profileKpis"></div>
+        <div class="hr"></div>
+        <div class="noteBox" id="profileNotes"></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="cardHd">
+        <h2>本分段更容易赢的“中单优先池”</h2>
+        <span class="hint">点击英雄卡片可看该分段详细打法</span>
+      </div>
+      <div class="cardBd">
+        <div class="topPicks" id="topPicks"></div>
+        <div class="legend">
+          <span><span class="dot S"></span>S：强烈推荐</span>
+          <span><span class="dot A"></span>A：推荐</span>
+          <span><span class="dot B"></span>B：可用</span>
+          <span><span class="dot C"></span>C：慎选</span>
+          <span><span class="dot D"></span>D：不建议（除非绝活/对策）</span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <section class="card" style="margin-top:14px">
+    <div class="cardHd">
+      <h2>全中路英雄矩阵（含常见非常规中单）</h2>
+      <span class="hint">小格子从左到右：1200-1399 / 1400-1599 / 1600-1799 / 1800-1999 / 2000-2100</span>
+    </div>
+    <div class="cardBd">
+      <div class="heroGrid" id="heroGrid"></div>
+      <div class="mini">说明：<strong>版本梯度</strong>反映大环境优先级；<strong>分段适配</strong>反映“在该分段更容易稳定赢”。两者不等同。</div>
+    </div>
+  </section>
+</main>
+
+<div class="modalBackdrop" id="modalBackdrop" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modalHd">
+      <div class="left">
+        <img class="avatar" id="modalImg" alt=""/>
+        <div>
+          <h3 id="modalTitle">—</h3>
+          <div class="chips" id="modalChips"></div>
+        </div>
+      </div>
+      <button class="xBtn" id="closeModalBtn" aria-label="关闭">✕</button>
+    </div>
+    <div class="modalBd">
+      <div class="cols">
+        <div>
+          <div class="noteBox" id="modalText"></div>
+          <div class="bars" id="modalBars"></div>
+        </div>
+        <div class="noteBox" id="modalTips"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <div class="hr"></div>
+  <div>
+    <strong>方法说明（公开的判断框架）</strong><br/>
+    本页面用四类维度估算“某中单英雄在某分段更容易抬胜率”：<br/>
+    1) <strong>队友依赖</strong>（需要队友给视野/跟控制/跟节奏的程度）；<br/>
+    2) <strong>上手难度</strong>（操作与容错）；<br/>
+    3) <strong>分段画像</strong>（控线、支援速度、小地图、资源团习惯）；<br/>
+    4) <strong>版本强度</strong>（公开梯度榜反映的大环境优先级）。<br/>
+    最终用 S/A/B/C/D 做分段适配评级：表示“更容易稳定赢”，不是官方胜率数据；绝活/对策位会改变结论。
+  </div>
+  <div class="hr"></div>
+  <div>
+    <strong>参考来源</strong><br/>
+    - S41赛季末中路梯度（腾讯新闻·指尖上的王者）：https://news.qq.com/rain/a/20251223A03LIS00<br/>
+    - S41中单梯度（17173）：https://news.17173.com/content/10032025/205705981.shtml<br/>
+    - 英雄头像图（52API 英雄数据库）：https://pvp.52api.cn/
+  </div>
+  <div class="hr"></div>
+  <div class="hint">© 仅作学习与讨论；版本与平衡改动会让结论波动，请以个人熟练度与当前对局为准。</div>
+</div>
+
+<script>
+  const BRACKETS = [
+    { key:"b1", label:"1200–1399", macro:"更偏打架", map:"偏低", roam:"慢~中", pool:"偏浅", noteBadge:"先稳线，再抓人" },
+    { key:"b2", label:"1400–1599", macro:"打架为主、开始转线", map:"中", roam:"中", pool:"开始变深", noteBadge:"线权→河道→边路" },
+    { key:"b3", label:"1600–1799", macro:"节奏/资源团明显提升", map:"中高", roam:"中快", pool:"更深", noteBadge:"清线速度=节奏速度" },
+    { key:"b4", label:"1800–1999", macro:"运营与团战质量都高", map:"高", roam:"快", pool:"深", noteBadge:"体系与细节" },
+    { key:"b5", label:"2000–2100", macro:"顶端局：对策与信息差", map:"极高", roam:"很快", pool:"很深", noteBadge:"对策 + 先到位" },
+  ];
+
+  // 中路版本梯度（主要参考：腾讯新闻 12/23 & 17173 10/03 的 S41 观点；并补充少量“非常规中单”）
+  const HEROES = [
+    // T0
+    mkHero("海月","https://pvp.52api.cn/img/521.jpg","T0","单点压制/抓人/小团战","b4",
+      {b1:"A",b2:"A",b3:"S",b4:"S",b5:"S"},
+      {diff:4, sync:3, clear:4, roam:4},
+      ["抓人","强对抗","资源团","单点压制"],
+      "版本级强势：能抓人、能压线、能把关键团战打成多打少。",
+      {
+        b1:"先稳清线再游走；大招优先抓没净化/没位移的脆皮。",
+        b2:"抢线后跟打野控河道；用大招隔离核心打多打少。",
+        b3:"龙团前提前到位布信息；大招先手抓C或反手隔离切后。",
+        b4:"多用“隔离”制造优势团；留位移躲关键控制。",
+        b5:"顶端局更看对策：大招抓关键C，或把开团者关进来让队友处理。"
+      },
+      "队友需求：中等。你能自己创造机会，但队友跟得上会更爆炸。"
+    ),
+    mkHero("女娲","https://pvp.52api.cn/img/179.jpg","T0","远程控场/封路/支援","b4",
+      {b1:"A",b2:"A",b3:"S",b4:"S",b5:"S"},
+      {diff:4, sync:2, clear:4, roam:3},
+      ["封路","阵地","远程开团","守塔"],
+      "版本级强势：安全、控场强、能守能攻；越高分越能用“封路+信息差”赢资源团。",
+      {
+        b1:"清线后用二技能封走位；别贪压线，先保中塔。",
+        b2:"线权在手就控河道草；封路+控制配合打野抓边。",
+        b3:"用传送门抢节奏：支援/守塔/抢龙都强；大招可远程开团或收割。",
+        b4:"阵地战核心：封路逼位移，先把对面后排打残再开。",
+        b5:"顶端局玩信息差：提前摆墙封草，逼对面交关键位移/净化。"
+      },
+      "队友需求：偏低。你更像“团队节奏稳定器”。"
+    ),
+
+    // T0.5
+    mkHero("沈梦溪","https://pvp.52api.cn/img/312.jpg","T0.5","清线快/支援/消耗","b3",
+      {b1:"B",b2:"A",b3:"S",b4:"S",b5:"S"},
+      {diff:4, sync:2, clear:5, roam:5},
+      ["清线","支援","消耗","抢节奏"],
+      "节奏型法师天花板：清线与支援效率极高，强在把每一波兵线都变成一次节奏机会。",
+      {
+        b1:"先把清线与安全站位练稳；别盲追，先处理兵线。",
+        b2:"清完线就去河道压血线，帮打野抢河蟹/视野。",
+        b3:"强势区：一波线一波支援；团前先消耗再接团。",
+        b4:"龙团前提前占位压后排；注意防突脸别被秒。",
+        b5:"顶端局更强：用消耗把团战变成“残血开团”，效率碾压。"
+      },
+      "队友需求：偏低。你自己就能带起节奏，队友会接更舒服。"
+    ),
+    mkHero("诸葛亮","https://pvp.52api.cn/img/190.jpg","T0.5","机动收割/抓机会","b4",
+      {b1:"A",b2:"A",b3:"S",b4:"S",b5:"A"},
+      {diff:3, sync:2, clear:3, roam:4},
+      ["收割","机动","抓机会","逆风翻盘"],
+      "稳定的节奏与收割点：能跟着小团滚雪球，也能在逆风靠机会翻盘。",
+      {
+        b1:"稳清线别乱交位移；有被动层再换血。",
+        b2:"跟打野抓边路；二技能留来追击/躲控制，大招别乱交。",
+        b3:"抓到人就转资源：击杀后立刻控龙/推塔，别恋战。",
+        b4:"别幻想一打五：等队友先手或对面交关键控制再进场收割。",
+        b5:"顶端局更偏“效率收割”：保命优先，收关键残血与核心位。"
+      },
+      "队友需求：偏低。你更像“把优势兑现”的那个人。"
+    ),
+    mkHero("嫦娥","https://pvp.52api.cn/img/515.jpg","T0.5","半肉法师/续航/资源团","b4",
+      {b1:"B",b2:"A",b3:"A",b4:"S",b5:"A"},
+      {diff:3, sync:3, clear:4, roam:3},
+      ["续航","资源团","抗压","压阵"],
+      "强在资源团与中期战斗力：能顶第一波、能压阵地，适合打河道与龙区。",
+      {
+        b1:"控好蓝量与盾：清线为主，别无脑打架。",
+        b2:"线权后游走河道：团前大招先压血线再接团。",
+        b3:"团战当半个前排：顶第一波给后排输出空间。",
+        b4:"资源团强势：提前占位、逼对面走位，打持久战更赚。",
+        b5:"看阵容更重要：对面爆发高时站位更克制，别被瞬秒。"
+      },
+      "队友需求：中等。队伍愿意围绕河道打，你更强。"
+    ),
+    mkHero("大乔(中单)","https://pvp.52api.cn/img/191.jpg","T0.5","运营/回城补给/集结","b5",
+      {b1:"D",b2:"C",b3:"B",b4:"A",b5:"S"},
+      {diff:5, sync:5, clear:4, roam:5},
+      ["运营","回城补给","多打少","推塔"],
+      "越高分越强的运营中单：能把对局变成“我方永远先到位、永远先补给”。",
+      {
+        b1:"不推荐：队友不懂回城/集结，会把你当摆设。",
+        b2:"想玩建议双排：二技能先当保命口，不要强行摇人。",
+        b3:"清线后用传送门支援；大招多用于反打与拆塔节奏。",
+        b4:"运营点：线权→支援→多打少；团前先摆好撤退口。",
+        b5:"顶端局强：回城补给+集结能把龙团变“必赚”，关键是节奏与沟通。"
+      },
+      "队友需求：很高。队友会听节奏、会控线，强度才兑现。"
+    ),
+
+    // T1
+    mkHero("甄姬","https://pvp.52api.cn/img/127.jpg","T1","团控/反打/易上手","b2",
+      {b1:"S",b2:"A",b3:"A",b4:"A",b5:"A"},
+      {diff:2, sync:3, clear:3, roam:2},
+      ["团控","反打","龙坑强","易上手"],
+      "稳定的团控法师：低分容易打满控制，高分更依赖站位与角度。",
+      {
+        b1:"对线期弹弹乐很强；团战先控到人就能赢。",
+        b2:"抢线后去河道：一技能控草配合打野抢资源。",
+        b3:"龙坑团神：提前站位铺冰；别暴露给刺客。",
+        b4:"更偏反手：等对面进场再开大，避免空大。",
+        b5:"顶端局要更克制：靠视野与角度，避免先手露头被秒。"
+      },
+      "队友需求：中等。你控到人，队友能集火就容易赢。"
+    ),
+    mkHero("小乔","https://pvp.52api.cn/img/106.jpg","T1","爆发/清线/团战输出","b2",
+      {b1:"S",b2:"A",b3:"A",b4:"A",b5:"A"},
+      {diff:2, sync:2, clear:4, roam:2},
+      ["爆发","清线","团战","压制"],
+      "“清线快+团战输出高”的经典答案：越高分越考验防抓与站位。",
+      {
+        b1:"二技能当保命；别压太深，抓到机会一套带走。",
+        b2:"清线快：抢线后跟辅助/打野控河道节奏。",
+        b3:"更看反蹲与站位：团战任务是打满输出，不是先手送。",
+        b4:"团战保持后排距离，用扇子+大招打持续压制。",
+        b5:"高分最怕被抓：多看小地图，留闪/净化保命。"
+      },
+      "队友需求：偏低。你只要不被抓崩，输出就能赢。"
+    ),
+    mkHero("西施","https://pvp.52api.cn/img/523.jpg","T1","抓单/控制/配合","b3",
+      {b1:"B",b2:"A",b3:"A",b4:"A",b5:"B"},
+      {diff:4, sync:4, clear:3, roam:3},
+      ["抓单","控制","信息差","反手"],
+      "抓单与控制很强，但吃命中与队友跟进；中段最容易打出性价比。",
+      {
+        b1:"先练二技能命中；控到就立刻叫队友打。",
+        b2:"抓单强：多去边路草丛找机会，少在中路无意义对炮。",
+        b3:"强势区：配合打野抓人效率高，控到就能转资源。",
+        b4:"团战更偏反手：拉关键C位出位置，配合集火。",
+        b5:"对手更会躲：一定配合视野与绕侧面角度。"
+      },
+      "队友需求：偏高。你控到人，队友必须跟得上输出。"
+    ),
+    mkHero("不知火舞","https://pvp.52api.cn/img/157.jpg","T1","高机动/抓人/支援","b4",
+      {b1:"C",b2:"B",b3:"A",b4:"A",b5:"A"},
+      {diff:5, sync:3, clear:3, roam:5},
+      ["抓人","高机动","支援","切后排"],
+      "高上限节奏中单：强在抓人、逼技能、打乱对面站位；越高分越强但更吃熟练。",
+      {
+        b1:"除非绝活：先保证清线不崩，别无脑进场。",
+        b2:"以抓单为主：蹲河道/边路草，抓脆皮滚节奏。",
+        b3:"清线后多动：进场前先打掉对面关键控制。",
+        b4:"高分强势：连招要稳，留位移撤退，打完就走。",
+        b5:"对策与细节：更多是逼技能+骚扰后排，不必每次追求秒杀。"
+      },
+      "队友需求：中等。你能创造机会，但队友会接就更赚。"
+    ),
+    mkHero("杨玉环","https://pvp.52api.cn/img/176.jpg","T1","续航/消耗/拉扯团","b3",
+      {b1:"A",b2:"A",b3:"A",b4:"A",b5:"B"},
+      {diff:3, sync:3, clear:3, roam:3},
+      ["续航","拉扯","保命","消耗"],
+      "稳健型中单：消耗与续航兼具，适合打拉扯与资源团；顶端局更吃阵容与站位。",
+      {
+        b1:"稳健发育：大招当保命/反打，不要乱交。",
+        b2:"跟队伍打小团：你是续航+消耗，别独自深入。",
+        b3:"强在拉扯：团前消耗，团中保命，团后追击。",
+        b4:"资源团提前占位，别被先手；你越活越强。",
+        b5:"对手强突脸时站位更极限：需要队友能打拉扯。"
+      },
+      "队友需求：中等偏高。队伍会拉扯、会反打时收益最大。"
+    ),
+    mkHero("貂蝉","https://pvp.52api.cn/img/141.jpg","T1","持续输出/近战法刺","b4",
+      {b1:"B",b2:"B",b3:"A",b4:"A",b5:"A"},
+      {diff:4, sync:3, clear:3, roam:3},
+      ["持续输出","吸血","进场时机","反打"],
+      "上限高但更吃进场时机：高分更适合“后进场打持久战”，低分容易上头掉点。",
+      {
+        b1:"别硬一打多：等对面关键技能交完再进场。",
+        b2:"更多打小团与野区团：有视野再进场更稳。",
+        b3:"强势区：跟着辅助/打野进场，打持久战很赚。",
+        b4:"团战节奏：让队友先开，貂蝉后进收割更稳。",
+        b5:"顶端局很吃细节：CD与走位管理决定胜负，别贪输出送掉。"
+      },
+      "队友需求：中等。队友能给视野/能先手，你更容易起飞。"
+    ),
+
+    // T2
+    mkHero("上官婉儿","https://pvp.52api.cn/img/513.jpg","T2","爆发切入/高操作","b4",
+      {b1:"C",b2:"C",b3:"B",b4:"B",b5:"B"},
+      {diff:5, sync:3, clear:3, roam:4},
+      ["切后排","爆发","高操作","抓机会"],
+      "高操作爆发位：能靠一次成功起飞改变团战，但稳定性与容错都吃熟练度。",
+      {
+        b1:"除非绝活，否则慎选：飞歪一次就掉节奏。",
+        b2:"抓无位移脆皮：先逼位移再起飞更稳。",
+        b3:"起飞前先确认视野与反蹲，别盲飞。",
+        b4:"高分更要耐心：等关键控制交掉再飞，避免被打断。",
+        b5:"对手应对成熟：更多作为威胁位，别每次都强行起飞。"
+      },
+      "队友需求：中等。你切进去要能有人补伤害/接控制。"
+    ),
+    mkHero("武则天","https://pvp.52api.cn/img/136.jpg","T2","开团补强/全图控制","b2",
+      {b1:"A",b2:"A",b3:"A",b4:"B",b5:"B"},
+      {diff:3, sync:4, clear:4, roam:3},
+      ["全图控制","开团","反手","控场"],
+      "功能与控制很强：大招是节奏按钮；越高分越看“什么时候开”而不是“能不能开”。",
+      {
+        b1:"团战站后排控场；大招多支援收割。",
+        b2:"清线后压河道：击飞/大招配合打野抓单。",
+        b3:"你是团队开团补强：可先手也可反手断刺客。",
+        b4:"别把自己当纯输出：控场与断节奏更重要。",
+        b5:"顶端局更克制：大招留给关键资源点/关键C位。"
+      },
+      "队友需求：偏高。你控到人，队友要能迅速集火。"
+    ),
+    mkHero("干将莫邪","https://pvp.52api.cn/img/182.jpg","T2","超远消耗/压制后排","b4",
+      {b1:"C",b2:"B",b3:"B",b4:"A",b5:"A"},
+      {diff:5, sync:2, clear:3, roam:2},
+      ["消耗","压后排","吃熟练","打残再开"],
+      "强在持续消耗与压制C位：越高分越能用视野与角度打信息差；低分更吃命中率。",
+      {
+        b1:"吃命中：准度没练出来不要盲选。",
+        b2:"对线靠消耗压血线，但别放线太久，注意支援节奏。",
+        b3:"稳定发育后就能压制后排；多用视野找安全角度。",
+        b4:"强势区：团前把对面C位打残，队友就很好开团。",
+        b5:"顶端局更看信息差：安全角度持续压制，别被先手切死。"
+      },
+      "队友需求：偏低。你站位安全、消耗到位，就能带队伍赢团。"
+    ),
+
+    // T3（含对策/非常规）
+    mkHero("高渐离","https://pvp.52api.cn/img/115.jpg","T3","AOE爆发/抽血团","b1",
+      {b1:"A",b2:"B",b3:"B",b4:"C",b5:"C"},
+      {diff:3, sync:4, clear:2, roam:2},
+      ["AOE","吃阵容","近战进场","团战"],
+      "更像阵容对策：对面扎堆、近战多时强；高分更容易被拉扯与针对。",
+      {
+        b1:"抓对手扎堆：大招一开就能改团战，注意别被风筝。",
+        b2:"看阵容再选：对面击退多/机动高会很难玩。",
+        b3:"更偏对策：适合打抱团/近战多的阵容。",
+        b4:"高分慎选：需要队友先手，自己别先送。",
+        b5:"顶端局除绝活/对策不建议。"
+      },
+      "队友需求：偏高。需要队伍能开团、能留人。"
+    ),
+    mkHero("海诺","https://pvp.52api.cn/img/563.jpg","T3","战士法师/偏门中单","b3",
+      {b1:"C",b2:"C",b3:"B",b4:"B",b5:"B"},
+      {diff:4, sync:4, clear:3, roam:3},
+      ["偏门","吃熟练","打密集","小团"],
+      "偏门中单：更吃熟练与阵容窗口；在特定对局能很强，但不属于通用答案。",
+      {
+        b1:"偏门需要练：先把清线与站位学好。",
+        b2:"别无脑换血：找到节奏点再打小团。",
+        b3:"中段可用：像战士法师，适合打密集阵容。",
+        b4:"看阵容：对面爆发高/强控制时谨慎。",
+        b5:"顶端局多为绝活/对策。"
+      },
+      "队友需求：偏高。队伍愿意围绕你打小团/资源团更好。"
+    ),
+    mkHero("张良","https://pvp.52api.cn/img/156.jpg","T3","点控对策/抓单","b3",
+      {b1:"A",b2:"A",b3:"A",b4:"B",b5:"B"},
+      {diff:3, sync:4, clear:3, roam:3},
+      ["点控","对策","抓单","反刺"],
+      "标准对策中单：按住高机动核心就能赢团；高分更看“按谁、何时按”。",
+      {
+        b1:"控到就赢：别贪输出，按住脆皮让队友秒。",
+        b2:"跟打野抓边：你负责定点，队友负责输出。",
+        b3:"对策位：专门按刺客/射手；大招别浪费在坦克。",
+        b4:"更看时机：留大招防切后，不一定要先手。",
+        b5:"顶端局价值在威慑：站位更安全，控到关键人再打资源。"
+      },
+      "队友需求：偏高。控到人必须有人补伤害。"
+    ),
+
+    // T4（版本弱势但低分/对策仍可用）
+    mkHero("弈星","https://pvp.52api.cn/img/197.jpg","T4","封路/阵地/偏功能","b1",
+      {b1:"B",b2:"B",b3:"C",b4:"C",b5:"D"},
+      {diff:3, sync:4, clear:4, roam:3},
+      ["封路","阵地","大招","偏功能"],
+      "功能与阵地还在，但整体节奏与强度不如主流中单；越高分越难发挥。",
+      {
+        b1:"以守为主：大招封路抓人，但别太被动。",
+        b2:"团战靠大招圈人，需要队友跟进。",
+        b3:"开始乏力：更要配合视野与反蹲。",
+        b4:"慎选：更需要强势中路带节奏。",
+        b5:"不建议。"
+      },
+      "队友需求：偏高。需要队友懂得围绕你的阵地打。"
+    ),
+    mkHero("安琪拉","https://pvp.52api.cn/img/142.jpg","T4","爆发/易上手/怕突脸","b1",
+      {b1:"S",b2:"A",b3:"B",b4:"C",b5:"D"},
+      {diff:2, sync:2, clear:3, roam:2},
+      ["爆发","蹲草","易上手","怕切"],
+      "低分一套秒人的代表；越高分越容易被抓与被绕后切。",
+      {
+        b1:"一套秒人：多蹲草抓脆皮，打到就能滚雪球。",
+        b2:"别站太前：控制配合打野更稳，大招注意别被打断。",
+        b3:"更吃视野：容易被抓，适合当补伤害而不是主节奏。",
+        b4:"慎选：对手会绕角度切你，除非绝活。",
+        b5:"不建议。"
+      },
+      "队友需求：偏低。你抓到人就能拿优势。"
+    ),
+    mkHero("妲己","https://pvp.52api.cn/img/109.jpg","T4","锁敌爆发/抓单","b1",
+      {b1:"S",b2:"A",b3:"B",b4:"C",b5:"D"},
+      {diff:1, sync:2, clear:2, roam:2},
+      ["抓单","爆发","易上手","滚雪球"],
+      "低分“锁头”抓单强势；高分被视野与净化克制，更多是对策位。",
+      {
+        b1:"多蹲草抓脆皮：控到就秒，别浪费技能在坦克。",
+        b2:"配合打野抓边很有效，但记得先清线。",
+        b3:"开始容易被反制：更需要视野与站位。",
+        b4:"慎选：更适合作为对策抓特定英雄。",
+        b5:"不建议。"
+      },
+      "队友需求：偏低。你控到人队友补伤害即可。"
+    ),
+    mkHero("嬴政","https://pvp.52api.cn/img/110.jpg","T4","远程消耗/压线","b1",
+      {b1:"A",b2:"B",b3:"B",b4:"C",b5:"D"},
+      {diff:3, sync:2, clear:4, roam:2},
+      ["消耗","压线","推塔","怕突脸"],
+      "对线压制还在，但整体节奏与爆发不如主流；高分更容易被突脸针对。",
+      {
+        b1:"对线压制强：用大招压塔/打团，注意别被突脸。",
+        b2:"抢线后压河道血线，别长期站中路对炮。",
+        b3:"开始乏力：对手会针对你站位与闪现。",
+        b4:"慎选：节奏与爆发不足。",
+        b5:"不建议。"
+      },
+      "队友需求：偏低。你只要站得住，输出就有价值。"
+    ),
+    mkHero("王昭君","https://pvp.52api.cn/img/152.jpg","T4","守点/团控/阵地","b1",
+      {b1:"A",b2:"B",b3:"B",b4:"C",b5:"D"},
+      {diff:2, sync:3, clear:3, roam:2},
+      ["守点","龙坑","反打","阵地"],
+      "低分守点很强；高分更容易被绕后切与被打断大招。",
+      {
+        b1:"守点强：龙坑/塔下大招容易打满。",
+        b2:"控线守塔+反打：留技能防切。",
+        b3:"更吃角度：对手更会躲与打断。",
+        b4:"慎选：容易被强突脸。",
+        b5:"不建议。"
+      },
+      "队友需求：中等。需要队伍愿意守点打阵地。"
+    ),
+    mkHero("周瑜","https://pvp.52api.cn/img/124.jpg","T4","推线/消耗/压塔","b1",
+      {b1:"A",b2:"B",b3:"C",b4:"C",b5:"D"},
+      {diff:3, sync:3, clear:5, roam:2},
+      ["清线","压塔","火区","推中"],
+      "推线压塔能力强：低分靠推塔滚雪球；高分对手清线与防抓更成熟。",
+      {
+        b1:"推线快：用火区压线，多转线推塔。",
+        b2:"节奏点：线权→入侵→推中塔。",
+        b3:"对手更会清火与躲火，收益下降。",
+        b4:"慎选：强度与爆发不足。",
+        b5:"不建议。"
+      },
+      "队友需求：中等。队伍愿意推进，你更容易赢。"
+    ),
+    mkHero("扁鹊","https://pvp.52api.cn/img/119.jpg","T4","续航/拖后期","b1",
+      {b1:"A",b2:"B",b3:"C",b4:"D",b5:"D"},
+      {diff:2, sync:3, clear:2, roam:2},
+      ["续航","怕爆发","拖后期","重伤克制"],
+      "低分续航优势明显；分段越高爆发越高、重伤越普遍，强度会被压缩。",
+      {
+        b1:"小团很强：注意别被一套秒，团前叠毒更赚。",
+        b2:"对面出重伤后收益下降：你要更会拉扯。",
+        b3:"开始被爆发压制：更依赖阵容保护。",
+        b4:"不建议：爆发环境更重。",
+        b5:"不建议。"
+      },
+      "队友需求：偏高。需要队伍能保护你打持续战。"
+    ),
+    mkHero("金蝉","https://pvp.52api.cn/img/540.jpg","T4","限制位移/对策","b2",
+      {b1:"B",b2:"B",b3:"C",b4:"C",b5:"D"},
+      {diff:3, sync:4, clear:2, roam:2},
+      ["限制位移","对策","守点","偏慢"],
+      "对策型中单：打高机动阵容有用，但整体清线与节奏偏慢。",
+      {
+        b1:"打短手/突进有用；但清线慢，别丢线权。",
+        b2:"对策位：针对位移英雄，站位更靠后。",
+        b3:"收益下降：对手更会绕，需要视野配合。",
+        b4:"慎选：更需要主流强势中路。",
+        b5:"不建议。"
+      },
+      "队友需求：偏高。你更需要队伍有其他开团点。"
+    ),
+    mkHero("米莱狄","https://pvp.52api.cn/img/504.jpg","T4","推塔/滚雪球","b1",
+      {b1:"A",b2:"A",b3:"B",b4:"C",b5:"C"},
+      {diff:2, sync:2, clear:4, roam:2},
+      ["推塔","滚雪球","拆中塔","抓人少"],
+      "低分推塔收益极高；高分更会清兵守塔，你需要更强的转线与节奏意识。",
+      {
+        b1:"推塔神器：先推中塔再滚雪球，别贪人头。",
+        b2:"推塔时更怕被抓：做好视野再压塔。",
+        b3:"开始被针对：对手清线快，你要更会转线。",
+        b4:"慎选：高分守塔更成熟。",
+        b5:"慎选：更多是对策/绝活。"
+      },
+      "队友需求：偏低。你能自己把优势变成塔。"
+    ),
+    mkHero("姜子牙","https://pvp.52api.cn/img/148.jpg","T4","远程消耗/功能","b2",
+      {b1:"B",b2:"B",b3:"C",b4:"D",b5:"D"},
+      {diff:4, sync:4, clear:2, roam:2},
+      ["远程","功能","吃角度","偏弱势"],
+      "可玩但偏小众：更像功能法师；若不是绝活，不容易稳定抬胜率。",
+      {
+        b1:"远程消耗但别太被动：抢线权再支援。",
+        b2:"大招角度很重要：龙坑/塔下更好用。",
+        b3:"开始难：对手会切你，必须更靠视野。",
+        b4:"不建议。",
+        b5:"不建议。"
+      },
+      "队友需求：偏高。需要队伍能帮你站位与守视野。"
+    ),
+    mkHero("墨子(中单)","https://pvp.52api.cn/img/108.jpg","T4","炮台消耗/控制","b2",
+      {b1:"A",b2:"A",b3:"B",b4:"C",b5:"D"},
+      {diff:3, sync:2, clear:3, roam:2},
+      ["消耗","控制","对线强","容易被切"],
+      "低中分好用：对线压制与控制强；高分更容易被绕后切，且节奏不如主流中单。",
+      {
+        b1:"炮命中就赚：压血线+控到秒，注意反蹲。",
+        b2:"抢线压河道：打到就是赚，但别站太前。",
+        b3:"开始被绕切：更依赖视野与队友保护。",
+        b4:"慎选：更多建议走游走/辅助位。",
+        b5:"不建议。"
+      },
+      "队友需求：偏低。你命中率高就能建立优势。"
+    ),
+    mkHero("元流之子(法师)","https://pvp.52api.cn/img/582.jpg","T4","新英雄/功能输出","b3",
+      {b1:"C",b2:"B",b3:"B",b4:"C",b5:"C"},
+      {diff:3, sync:3, clear:3, roam:3},
+      ["新英雄","吃熟练","功能","需要理解"],
+      "新英雄（法师形态）：玩法与节奏更吃熟练度；中段可用，高分更偏绝活。",
+      {
+        b1:"机制新且吃熟练：先把清线与保命学稳。",
+        b2:"当功能法师：以清线支援为主，不要硬单杀。",
+        b3:"中段可用：跟着节奏走，团战找安全输出位。",
+        b4:"慎选：更建议用更稳定的T0/T0.5。",
+        b5:"慎选：需要绝活熟练度与阵容配合。"
+      },
+      "队友需求：中等。队友愿意跟节奏，你更容易发挥。"
+    ),
+
+    // 非常规中单（常见能打但更吃熟练/对策）
+    mkHero("露娜(中单)","https://pvp.52api.cn/img/146.jpg","T3","绝活法刺/收割","b4",
+      {b1:"D",b2:"C",b3:"B",b4:"B",b5:"C"},
+      {diff:5, sync:2, clear:2, roam:4},
+      ["绝活","高操作","收割","风险高"],
+      "非常规绝活中单：上限高但风险也高；不熟练等于掉节奏。",
+      {
+        b1:"除非绝活：容易断连导致送。",
+        b2:"先打稳发育：别强行进场。",
+        b3:"能玩：抓落单与收割为主，看视野进场。",
+        b4:"高分绝活位：进场时机与兵线处理更重要。",
+        b5:"顶端局风险高：更偏对策与极强熟练度。"
+      },
+      "队友需求：偏低。你更需要自己的稳定性与判断。"
+    ),
+    mkHero("司马懿(中单)","https://pvp.52api.cn/img/137.jpg","T3","刺客型中单/抓后排","b3",
+      {b1:"B",b2:"B",b3:"B",b4:"C",b5:"C"},
+      {diff:4, sync:2, clear:3, roam:4},
+      ["切后排","抓人","怕反蹲","高风险"],
+      "刺客型中单：清线后抓人很强，但高分更看视野与反蹲，风险上升。",
+      {
+        b1:"抓后排很爽：多蹲草，但别乱切送。",
+        b2:"清线后游走：带节奏为主，不要当线上法师对炮。",
+        b3:"更吃视野：先控河道再找切入。",
+        b4:"慎选：对手会提前布视野与反蹲。",
+        b5:"慎选：更多是对策/绝活。"
+      },
+      "队友需求：偏低。你要自己把进场风险算清楚。"
+    ),
+    mkHero("司空震(中单)","https://pvp.52api.cn/img/537.jpg","T3","发育型法战/中后期","b3",
+      {b1:"C",b2:"B",b3:"B",b4:"C",b5:"C"},
+      {diff:4, sync:3, clear:3, roam:3},
+      ["发育","中后期","怕强开","吃站位"],
+      "发育型中单：成型后团战很强，但前期更怕被针对；高分更容易被抓节奏。",
+      {
+        b1:"需要发育：前期别拼命，先把线清稳。",
+        b2:"中期成型后再打团，站位别太靠前。",
+        b3:"可用：拿线权跟资源团，注意怕强开。",
+        b4:"慎选：对手会针对你发育期与站位。",
+        b5:"慎选：更偏绝活/对策。"
+      },
+      "队友需求：中等。队友能帮你稳过前期，你的团战会更强。"
+    ),
+  ];
+
+  const PROFILE = {
+    b1:{
+      kpis:[
+        ["队友特点","小地图与支援偏弱，喜欢打架但不一定看线；中路经常被抓崩后全盘乱"],
+        ["中路要做什么","<strong>先稳住线权与中塔</strong>，再用“简单有效的抓人/团控”把团战打赢"],
+        ["最能抬胜率","安琪拉、妲己、甄姬、小乔（简单高收益） + 张良（对策）"],
+      ],
+      notes:`<strong>核心思路：</strong>“别先崩”。低分常见输法是：中路被抓死两次，中塔掉了，河道视野没了，然后全队被牵着走。<br/>
+      你要抬胜率，优先选：<strong>易上手爆发</strong>或<strong>团控清线</strong>，把队友最常见的失误“兜住”。<br/>
+      <strong>慎选</strong>：极吃运营/极吃配合的英雄（例如大乔中单）。`,
+      macroBadge:"先稳线 · 再抓人"
+    },
+    b2:{
+      kpis:[
+        ["队友特点","开始会围绕河蟹/小龙打，但仍容易上头；支援速度中等"],
+        ["中路要做什么","用<strong>清线速度换节奏</strong>：一波线→河道→边路；中路不要长期对炮"],
+        ["最能抬胜率","小乔、甄姬、诸葛亮、海月/女娲（熟练）、张良（针对位）"],
+      ],
+      notes:`<strong>核心思路：</strong>“线权就是第一波资源”。抢线后你先到河道，就能把第一次资源团的站位优势拿到手。<br/>
+      这个分段开始可以练：海月/女娲/沈梦溪这种<strong>收益更高、但更吃站位与节奏</strong>的英雄。`,
+      macroBadge:"线权→河道→边路"
+    },
+    b3:{
+      kpis:[
+        ["队友特点","小地图与支援明显变快；会围绕资源点打小规模团，英雄池更深"],
+        ["中路要做什么","把每波兵线都变成一次<strong>支援/控视野</strong>机会：快清线，快到位，快转资源"],
+        ["最能抬胜率","海月、女娲、沈梦溪、诸葛亮、西施、不知火舞（熟练）"],
+      ],
+      notes:`<strong>核心思路：</strong>“清线速度=节奏速度”。中路最强的赢法是：你永远比对面先到河道一步。<br/>
+      这档分段非常奖励：<strong>抢线、支援、先占位</strong>。只要你先到位，很多团战甚至不用打满就能赢。`,
+      macroBadge:"节奏显著 · 先到位"
+    },
+    b4:{
+      kpis:[
+        ["队友特点","团战更讲究进场时机；运营与控线成熟，很多局是“资源题”"],
+        ["中路要做什么","你要兼顾：<strong>线权</strong>、<strong>河道视野</strong>、<strong>团战控场</strong>，并把优势转成龙与塔"],
+        ["最能抬胜率","海月、女娲、沈梦溪、诸葛亮、嫦娥 + 大乔（会运营时）"],
+      ],
+      notes:`<strong>核心思路：</strong>“一波资源团定胜负”。这个分段你赢不是杀得多，而是：龙团你先到位、先布视野、先拿站位。<br/>
+      建议你准备两个中路池：一个<strong>强势节奏位</strong>（海月/女娲/梦溪），一个<strong>对策位</strong>（张良/武则天等）。`,
+      macroBadge:"体系与团战质量"
+    },
+    b5:{
+      kpis:[
+        ["队友特点","对策与细节非常强：卡草、假视野、反蹲、换线都更精细"],
+        ["中路要做什么","用<strong>信息差</strong>与<strong>对策</strong>赢：先到位、先占草、先消耗；关键技能别乱交"],
+        ["最能抬胜率","海月、女娲、沈梦溪、大乔（体系）、干将（熟练）、火舞（熟练）"],
+      ],
+      notes:`<strong>核心思路：</strong>“对策 + 先到位”。顶端局很多时候不是你输出多，而是你让对面<strong>不敢走某条路、不敢站某个草</strong>。<br/>
+      你需要把中路玩成“节奏位”：每波线后都做一件事——压河道、给视野、找角度、逼技能、逼回城。`,
+      macroBadge:"对策与信息差"
+    },
+  };
+
+  function mkHero(name,img,overallTier,type,bestBracket,ratings,stats,tags,summary,perBracketTips,teamNeed){
+    const overallRank = {"T0":0,"T0.5":1,"T1":2,"T2":3,"T3":4,"T4":5}[overallTier] ?? 9;
+    return {name,img,overallTier,type,bestBracket,ratings,stats,tags,summary,perBracketTips,teamNeed,overallRank};
+  }
+
+  const ratingScore = {S:5,A:4,B:3,C:2,D:1};
+  const bracketOrder = ["b1","b2","b3","b4","b5"];
+
+  let state = { bracket:"b3", tierFilter:"ALL", sortBy:"RATING" };
+
+  const els = {
+    tabs: document.getElementById("tabs"),
+    curBracketLabel: document.getElementById("currentBracketLabel"),
+    heroGrid: document.getElementById("heroGrid"),
+    topPicks: document.getElementById("topPicks"),
+    profileKpis: document.getElementById("profileKpis"),
+    profileNotes: document.getElementById("profileNotes"),
+    macroBadge: document.getElementById("macroBadge"),
+    tierFilter: document.getElementById("tierFilter"),
+    sortBy: document.getElementById("sortBy"),
+    resetBtn: document.getElementById("resetBtn"),
+    modalBackdrop: document.getElementById("modalBackdrop"),
+    modalImg: document.getElementById("modalImg"),
+    modalTitle: document.getElementById("modalTitle"),
+    modalChips: document.getElementById("modalChips"),
+    modalText: document.getElementById("modalText"),
+    modalBars: document.getElementById("modalBars"),
+    modalTips: document.getElementById("modalTips"),
+    closeModalBtn: document.getElementById("closeModalBtn"),
+  };
+
+  function init(){
+    const _d = new Date();
+    const _yyyy = _d.getFullYear();
+    const _mm = String(_d.getMonth()+1).padStart(2,"0");
+    const _dd = String(_d.getDate()).padStart(2,"0");
+    document.getElementById("today").textContent = `${_yyyy}-${_mm}-${_dd}`;
+
+    // Tabs
+    BRACKETS.forEach(b=>{
+      const d = document.createElement("div");
+      d.className = "tab" + (b.key===state.bracket ? " active":"");
+      d.textContent = b.label;
+      d.onclick = ()=>{ state.bracket=b.key; render(); };
+      els.tabs.appendChild(d);
+    });
+
+    els.tierFilter.onchange = ()=>{ state.tierFilter = els.tierFilter.value; render(); };
+    els.sortBy.onchange = ()=>{ state.sortBy = els.sortBy.value; render(); };
+    els.resetBtn.onclick = ()=>{
+      state = { bracket:"b3", tierFilter:"ALL", sortBy:"RATING" };
+      els.tierFilter.value="ALL";
+      els.sortBy.value="RATING";
+      render(true);
+    };
+
+    els.closeModalBtn.onclick = closeModal;
+    els.modalBackdrop.onclick = (e)=>{ if(e.target===els.modalBackdrop) closeModal(); };
+    window.addEventListener("keydown",(e)=>{ if(e.key==="Escape") closeModal(); });
+
+    render(true);
+  }
+
+  function render(updateTabs=false){
+    [...els.tabs.children].forEach((t,i)=>{
+      t.classList.toggle("active", BRACKETS[i].key===state.bracket);
+    });
+
+    els.curBracketLabel.textContent = BRACKETS.find(x=>x.key===state.bracket).label;
+    els.macroBadge.textContent = PROFILE[state.bracket].macroBadge;
+
+    // Profile
+    els.profileKpis.innerHTML = "";
+    PROFILE[state.bracket].kpis.forEach(([k,v])=>{
+      const div=document.createElement("div");
+      div.className="kpi";
+      div.innerHTML = `<div class="k">${k}</div><div class="v">${v}</div>`;
+      els.profileKpis.appendChild(div);
+    });
+    els.profileNotes.innerHTML = PROFILE[state.bracket].notes;
+
+    // Filter
+    let list = HEROES.slice();
+    if(state.tierFilter!=="ALL"){
+      list = list.filter(h=>h.overallTier===state.tierFilter);
+    }
+
+    // Sort
+    const bk = state.bracket;
+    list.sort((a,b)=>{
+      if(state.sortBy==="RATING"){
+        const da = ratingScore[a.ratings[bk]] ?? 0;
+        const db = ratingScore[b.ratings[bk]] ?? 0;
+        if(db!==da) return db-da;
+        if(a.overallRank!==b.overallRank) return a.overallRank-b.overallRank;
+        return a.name.localeCompare(b.name,"zh");
+      }
+      if(state.sortBy==="OVERALL"){
+        if(a.overallRank!==b.overallRank) return a.overallRank-b.overallRank;
+        const da = ratingScore[a.ratings[bk]] ?? 0;
+        const db = ratingScore[b.ratings[bk]] ?? 0;
+        if(db!==da) return db-da;
+        return a.name.localeCompare(b.name,"zh");
+      }
+      if(state.sortBy==="NAME"){
+        return a.name.localeCompare(b.name,"zh");
+      }
+      if(state.sortBy==="DIFF"){
+        if(b.stats.diff!==a.stats.diff) return b.stats.diff-a.stats.diff;
+        return a.name.localeCompare(b.name,"zh");
+      }
+      if(state.sortBy==="ROAM"){
+        if(b.stats.roam!==a.stats.roam) return b.stats.roam-a.stats.roam;
+        return a.name.localeCompare(b.name,"zh");
+      }
+      if(state.sortBy==="CLEAR"){
+        if(b.stats.clear!==a.stats.clear) return b.stats.clear-a.stats.clear;
+        return a.name.localeCompare(b.name,"zh");
+      }
+      return 0;
+    });
+
+    // Top picks (S/A first)
+    const top = list
+      .filter(h => ["S","A"].includes(h.ratings[bk]))
+      .sort((a,b)=>ratingScore[b.ratings[bk]]-ratingScore[a.ratings[bk]])
+      .slice(0, 8);
+
+    els.topPicks.innerHTML = "";
+    top.forEach(h=>{
+      const div=document.createElement("div");
+      div.className="pick";
+      div.innerHTML = `
+        <img class="avatar" src="${h.img}" alt="${h.name}"/>
+        <div style="min-width:0">
+          <div style="display:flex;gap:8px;align-items:center;justify-content:space-between">
+            <div class="name">${h.name}</div>
+            <span class="${tierBadgeClass(h.overallTier)}">${h.overallTier}</span>
+          </div>
+          <div class="desc">${pickDesc(h, bk)}</div>
+        </div>
+      `;
+      div.onclick = ()=> openModal(h);
+      els.topPicks.appendChild(div);
+    });
+
+    // Grid
+    els.heroGrid.innerHTML = "";
+    list.forEach(h=>{
+      const div=document.createElement("div");
+      div.className="hero";
+      div.innerHTML = `
+        <img class="avatar" src="${h.img}" alt="${h.name}"/>
+        <div class="meta">
+          <div class="row">
+            <div class="nm" title="${h.name}">${h.name}</div>
+            <span class="${tierBadgeClass(h.overallTier)}">${h.overallTier}</span>
+          </div>
+          <div class="type" title="${h.type}">${h.type}</div>
+          <div class="matrix">
+            ${bracketOrder.map(k=>{
+              const r = h.ratings[k];
+              const sel = (k===bk) ? " sel":"";
+              return `<div class="cell ${r}${sel}" title="${k.toUpperCase()}">${r}</div>`;
+            }).join("")}
+          </div>
+          <div class="mini">推荐分段：<strong>${BRACKETS.find(x=>x.key===h.bestBracket)?.label ?? "—"}</strong> · 上手：${stars(h.stats.diff)} · 清线：${stars(h.stats.clear)} · 支援：${stars(h.stats.roam)}</div>
+        </div>
+      `;
+      div.onclick = ()=> openModal(h);
+      els.heroGrid.appendChild(div);
+    });
+  }
+
+  function pickDesc(h, bk){
+    const quick = {
+      "b1":"先稳线，抓人/团控取胜",
+      "b2":"线权换节奏，带资源团",
+      "b3":"清线快=支援快",
+      "b4":"体系与团战质量",
+      "b5":"对策与信息差",
+    }[bk];
+    return `${h.summary.slice(0,44)}… <span style="color:rgba(125,211,252,.95)">（${quick}）</span>`;
+  }
+
+  function tierBadgeClass(t){
+    return "badge " + (t==="T0"?"t0": t==="T0.5"?"t05": t==="T1"?"t1": t==="T2"?"t2": t==="T3"?"t3":"t4");
+  }
+
+  function stars(n){
+    return "★".repeat(n) + "☆".repeat(5-n);
+  }
+
+  function openModal(h){
+    els.modalImg.src = h.img;
+    els.modalImg.alt = h.name;
+    els.modalTitle.textContent = h.name;
+
+    els.modalChips.innerHTML = `
+      <span class="${tierBadgeClass(h.overallTier)}">${h.overallTier}</span>
+      <span class="chip">${h.type}</span>
+      <span class="chip">推荐分段：${BRACKETS.find(x=>x.key===h.bestBracket)?.label ?? "—"}</span>
+      <span class="chip">当前分段适配：<strong style="color:var(--text)">${h.ratings[state.bracket]}</strong></span>
+    `;
+
+    const per = h.perBracketTips[state.bracket] ?? "—";
+    els.modalText.innerHTML = `
+      <div><strong>一句话定位：</strong>${h.summary}</div>
+      <div style="margin-top:10px"><strong>在当前分段（${BRACKETS.find(x=>x.key===state.bracket).label}）怎么玩更容易赢：</strong><br/>${per}</div>
+      <div style="margin-top:10px"><strong>队友画像匹配：</strong>${h.teamNeed}</div>
+      <div class="chips">
+        ${h.tags.map(t=>`<span class="chip">#${t}</span>`).join("")}
+      </div>
+    `;
+
+    els.modalBars.innerHTML = "";
+    const barItems = [
+      ["上手难度", h.stats.diff],
+      ["队友依赖", h.stats.sync],
+      ["清线能力", h.stats.clear],
+      ["支援能力", h.stats.roam],
+    ];
+    barItems.forEach(([lbl,val])=>{
+      const row=document.createElement("div");
+      row.className="barRow";
+      row.innerHTML = `
+        <div class="lbl">${lbl}</div>
+        <div class="bar"><div class="fill" style="width:${(val/5)*100}%"></div></div>
+        <div class="n">${val}/5</div>
+      `;
+      els.modalBars.appendChild(row);
+    });
+
+    els.modalTips.innerHTML = `
+      <strong>中路通用小贴士</strong><br/>
+      <ul class="list">
+        <li><strong>第一原则：</strong>中塔别先掉。中塔一掉，视野与河道节奏全没。</li>
+        <li><strong>线权=节奏：</strong>每波线清完做一件事：压河道、给视野、支援边路、或帮打野入侵。</li>
+        <li><strong>资源团：</strong>提前 5–10 秒到河道卡草/占位，团战自然更好打。</li>
+        <li><strong>别贪：</strong>中单最常见掉分方式是“多贪一波线/多贪一个人头”然后被抓死。</li>
+        <li><strong>对策：</strong>对面高机动/强刺客时，张良/武则天/女娲这类控场与反手更稳。</li>
+      </ul>
+      <div class="hr"></div>
+      <div class="hint">提示：矩阵评分是“更容易稳定赢”，不是官方胜率统计。</div>
+    `;
+
+    els.modalBackdrop.style.display="flex";
+    els.modalBackdrop.setAttribute("aria-hidden","false");
+  }
+
+  function closeModal(){
+    els.modalBackdrop.style.display="none";
+    els.modalBackdrop.setAttribute("aria-hidden","true");
+  }
+
+  init();
+</script>
+</body>
+</html>
